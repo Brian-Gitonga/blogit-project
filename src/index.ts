@@ -36,7 +36,7 @@ app.post("/auth/register", async (req, res) => {
       where: { emailAddress },
     });
     if (emailExists) {
-      return res.status(400).json({ error: "Email already in use" });
+      return res.status(400).json({ error: "Email already in use try another email" });
     }
     //checking if username of the user exists
     const usernameExists = await client.user.findUnique({
@@ -57,61 +57,41 @@ app.post("/auth/register", async (req, res) => {
     });    
     res.status(201).json({ message: "Registration successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to register user" });
+    res.status(500).json({ error: "Someing went wrong trying to register" });
   }
 });
 
 
 //login function block
-app.get("/auth/login", async (req, res) => {
+app.post("/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await client.user.findUnique({
       where: { username },
     });
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(400).json({ error: "Invalid login credentials" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid password" });
+      return res.status(401).json({ error: "Invalid login credentials" });
     }
-    res.status(200).json(
-        {
-          //jwt and create a cookie
-
-          token: jwt.sign(
-            {
-              username: user.username,
-              emailAddress: user.emailAddress,
-            },
-            process.env.JWT_SECRET as string,
-            { expiresIn: "1h" }
-          ),
-          //create cookie
-          cookie: {
-            name: "authToken",
-            value: jwt.sign(
-              {
-                username: user.username,
-                emailAddress: user.emailAddress,
-              },
-              process.env.JWT_SECRET as string,
-              { expiresIn: "1h" }
-            ),
-            
-          },
-
-          message: "Login successful"
-        }
-    );
+    const payload = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        emailAddress: user.emailAddress,
+        username: user.username,
+    }
+    const token = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: "10h" });
+    res.status(200).cookie("authToken", token).json(payload);
   } catch (error) {
     res.status(500).json({ error: "something went wrong trying to login" });
   }
 });
 
 //loging out the user
-app.get("/auth/logout", async (req, res) => {
+app.post("/auth/logout", async (req, res) => {
   try {
     res.clearCookie("authToken");
     res.status(200).json({ message: "Logout successful" });
@@ -121,15 +101,19 @@ app.get("/auth/logout", async (req, res) => {
 });
 
 
-//get all users function block
-app.get("/users", async (req, res) => {
-  try {
-    const users = await client.user.findMany();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to get users" });
-  }
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
