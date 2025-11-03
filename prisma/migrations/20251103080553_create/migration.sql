@@ -1,0 +1,32 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- CreateTable
+CREATE TABLE [dbo].[Users] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [FirstName] NVARCHAR(1000) NOT NULL,
+    [LastName] NVARCHAR(1000) NOT NULL,
+    [emailAddress] NVARCHAR(1000) NOT NULL,
+    [username] NVARCHAR(1000) NOT NULL,
+    [Password] NVARCHAR(1000) NOT NULL,
+    [isDeleted] BIT NOT NULL CONSTRAINT [Users_isDeleted_df] DEFAULT 0,
+    [dateJoined] DATETIME2 NOT NULL CONSTRAINT [Users_dateJoined_df] DEFAULT CURRENT_TIMESTAMP,
+    [lastUpdated] DATETIME2 NOT NULL,
+    CONSTRAINT [Users_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [Users_emailAddress_key] UNIQUE NONCLUSTERED ([emailAddress]),
+    CONSTRAINT [Users_username_key] UNIQUE NONCLUSTERED ([username])
+);
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH
