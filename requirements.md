@@ -98,3 +98,81 @@ No releases published
 Packages
 No packages published
 Footer
+
+Blogs
+Create a Blog
+To create a new blog, the user must provide the following details:
+
+Title: The title of the blog post.
+Synopsis: A short summary of the blog.
+Featured Image URL: A link to the blog's featured image.
+Content: The main body of the blog.
+Blog Model Structure
+The Blog model should contain the following fields:
+
+id: A unique identifier for each blog post. Use Prisma’s UUID as the default: @default(uuid())
+title: A required String representing the blog title.
+synopsis: A required String summarizing the blog content.
+featuredImageUrl: An optional String for the featured image URL. Default is null.
+content: A required String containing the main body of the blog.
+isDeleted: A Boolean flag indicating whether the blog has been deleted. Default is false.
+createdAt: A DateTime value representing when the blog was created. Use Prisma’s now() as the default: @default(now())
+lastUpdated: A DateTime field that automatically updates whenever the record changes, mark with @updatedAt.
+Notes
+Implement a one-to-many relationship between User and Blog: one user can create multiple blogs, but each blog must belong to exactly one user.
+This action is restricted to authenticated users only.
+Endpoint: POST /blogs
+Get Blogs
+Implement an endpoint that gets all the blogs that have not been deleted (isDeleted: false).
+This action is restricted to authenticated users only.
+The following fields should be retrieved for each blog:
+id
+title
+synopsis
+featuredImageUrl
+createdAt
+User information (creator of the blog):
+firstName
+lastName
+Endpoint: GET /blogs
+Get Blog
+Implement an endpoint to retrieve a single blog by its ID.
+If no matching blog is found, or if the blog is marked as deleted, respond with a user-friendly error message: Blog not found
+This action is restricted to authenticated users only.
+The following fields should be retrieved:
+id
+title
+synopsis
+featuredImageUrl
+content
+createdAt
+lastUpdated
+User information (creator of the blog):
+firstName
+lastName
+Endpoint: GET /blogs/:blogId
+Update a Blog
+Implement an endpoint for updating a blog.
+This action is restricted to authenticated users only.
+The following are the fields that can be updated:
+title
+synopsis
+featuredImageUrl
+content
+The endpoint should validate user authorization before applying any changes to ensure that only the blog’s owner can update it.
+Endpoint: PATCH /blogs/:blogId
+Move Blog to Trash
+Implement an endpoint for marking a blog as deleted by changing the isDeleted field from false to true.
+This action is restricted to authenticated users only.
+The endpoint should validate user authorization before applying any changes to ensure that only the blog’s owner can update it.
+Endpoint: PATCH /blogs/trash/:blogId
+Restore a Deleted Blog
+Implement an endpoint for restoring a deleted blog by changing the isDeleted field from true to false.
+This action is restricted to authenticated users only.
+The endpoint should validate user authorization before applying any changes to ensure that only the blog’s owner can update it.
+Endpoint: PATCH /blogs/restore/:blogId
+Delete a Blog Permanently
+Implement an endpoint to delete a blog permanently.
+This action is restricted to authenticated users only.
+The endpoint should validate user authorization before applying any changes to ensure that only the blog’s owner can update it.
+Endpoint: DELETE /blogs/:blogId

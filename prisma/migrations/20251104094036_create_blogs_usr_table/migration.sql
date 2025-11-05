@@ -1,0 +1,49 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- CreateTable
+CREATE TABLE [dbo].[Users] (
+    [Id] NVARCHAR(1000) NOT NULL,
+    [FirstName] NVARCHAR(1000) NOT NULL,
+    [LastName] NVARCHAR(1000) NOT NULL,
+    [EmailAddress] NVARCHAR(1000) NOT NULL,
+    [Username] NVARCHAR(1000) NOT NULL,
+    [Password] NVARCHAR(1000) NOT NULL,
+    [IsDeleted] BIT NOT NULL CONSTRAINT [Users_IsDeleted_df] DEFAULT 0,
+    [DateJoined] DATETIME2 NOT NULL CONSTRAINT [Users_DateJoined_df] DEFAULT CURRENT_TIMESTAMP,
+    [LastUpdated] DATETIME2 NOT NULL,
+    CONSTRAINT [Users_pkey] PRIMARY KEY CLUSTERED ([Id]),
+    CONSTRAINT [Users_EmailAddress_key] UNIQUE NONCLUSTERED ([EmailAddress]),
+    CONSTRAINT [Users_Username_key] UNIQUE NONCLUSTERED ([Username])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[Blogs] (
+    [Id] NVARCHAR(1000) NOT NULL,
+    [Title] NVARCHAR(1000) NOT NULL,
+    [Synopsis] NVARCHAR(1000) NOT NULL,
+    [FeaturedImageUrl] NVARCHAR(1000),
+    [Content] NVARCHAR(1000) NOT NULL,
+    [IsDeleted] BIT NOT NULL CONSTRAINT [Blogs_IsDeleted_df] DEFAULT 0,
+    [CreatedAt] DATETIME2 NOT NULL CONSTRAINT [Blogs_CreatedAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [LastUpdated] DATETIME2 NOT NULL,
+    [UserId] NVARCHAR(1000) NOT NULL,
+    CONSTRAINT [Blogs_pkey] PRIMARY KEY CLUSTERED ([Id])
+);
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Blogs] ADD CONSTRAINT [Blogs_UserId_fkey] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users]([Id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH
